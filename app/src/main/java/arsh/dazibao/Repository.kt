@@ -40,9 +40,9 @@ class Repository(private val api: API) {
         )
 
     suspend fun getPosts() =
-        api.getAllPosts()
+        api.getAllIdeas()
 
-    suspend fun getPostsRecent() =
+    suspend fun getIdeasRecent() =
         api.getRecent()
 
     suspend fun getPostsAfter(id: Long) =
@@ -51,16 +51,16 @@ class Repository(private val api: API) {
     suspend fun getPostsBefore(id: Long) =
         api.before(id)
 
-    suspend fun likePost(id: Long) =
-        api.likePost(id)
+    suspend fun likeIdea(id: Long) =
+        api.likeIdea(id)
 
-    suspend fun dislikePost(id: Long) =
-        api.dislikePost(id)
+    suspend fun dislikeIdea(id: Long) =
+        api.dislikeIdea(id)
 
-    suspend fun addNewPost(content: String, attid: String?) =
-        api.createPost(IdeaRequestDto(text = content, attachmentImage = attid,attachmentLink = ""))
+    suspend fun addNewIdea(content: String, attid: String?,link: String?) =
+        api.createIdea(IdeaRequestDto(id=-1,content = content, attachmentImage = attid,attachmentLink = link))
 
-    suspend fun addNewPost(content: String) = api.createPost(IdeaRequestDto(text = content,attachmentImage = "",attachmentLink = ""))
+    suspend fun addNewIdea(content: String) = api.createIdea(IdeaRequestDto(id=-1,content = content,attachmentImage = "",attachmentLink = ""))
 
     suspend fun upload(bitmap: Bitmap): Response<Attachment> {
         // Создаем поток байтов
@@ -76,4 +76,6 @@ class Repository(private val api: API) {
             MultipartBody.Part.createFormData("file", "image.jpg", reqFIle)
         return api.uploadImage(body)
     }
+    suspend fun getVotes(idIdea: Long) =
+        api.getVotes(idIdea)
 }

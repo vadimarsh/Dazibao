@@ -18,4 +18,11 @@
     <string name="load_more">Загрузить еще</string>
     <string name="loading_posts">Загружаем</string>
     <string name="please_wait">Пожалуйста, подождите</string>
+    <string name="create_new_idea">Создать новую идею</string>
+    <string name="enter_idea_content">Введите текст идеи</string>
+    <string name="error_occured">Ошибка</string>
+    <string name="idea_created_success">Идея добавлена!</string>
+    <string name="hint_idea_url">Введите URL</string>
+    <string name="msg_already_voted">Вы уже отдали свой голос</string>
+    <string name="like_in_progress">Обработка голоса</string>
 </resources>

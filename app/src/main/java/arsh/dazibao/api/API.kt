@@ -5,6 +5,7 @@ import arsh.dazibao.dto.IdeaRequestDto
 import arsh.dazibao.dto.RegistrationRequestParams
 import arsh.dazibao.model.Attachment
 import arsh.dazibao.model.Idea
+import arsh.dazibao.model.Vote
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -31,16 +32,19 @@ interface API {
     suspend fun before(@Path("id") id: Long): Response<List<Idea>>
 
     @GET("api/v1/posts")
-    suspend fun getAllPosts(): Response<List<Idea>>
+    suspend fun getAllIdeas(): Response<List<Idea>>
 
     @POST("api/v1/posts/like/{id}")
-    suspend fun likePost(@Path("id") id: Long): Response<Idea>
+    suspend fun likeIdea(@Path("id") id: Long): Response<Idea>
 
     @POST("api/v1/posts/dislike/{id}")
-    suspend fun dislikePost(@Path("id") id: Long): Response<Idea>
+    suspend fun dislikeIdea(@Path("id") id: Long): Response<Idea>
 
     @POST("api/v1/posts")
-    suspend fun createPost(@Body createPostRequest: IdeaRequestDto): Response<Idea>
+    suspend fun createIdea(@Body createPostRequest: IdeaRequestDto): Response<Idea>
+
+    @GET("api/v1/posts/{id}/votes")
+    suspend fun getVotes(@Path("id") idIdea: Long): Response<List<Vote>>
 
     /*@POST("api/v1/posts/share/{id}")
     suspend fun sharePost(
@@ -52,5 +56,7 @@ interface API {
     @POST("api/v1/media")
     suspend fun uploadImage(@Part file: MultipartBody.Part):
             Response<Attachment>
+
+
 
 }

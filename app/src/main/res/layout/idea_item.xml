@@ -14,6 +14,8 @@
     app:contentPadding="10dp"
     tools:context=".MainActivity">
 
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ideaItem"
         android:layout_width="match_parent"
@@ -27,12 +29,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:id="@+id/avatarIv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
-
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:layout_constraintHeight_max="56dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_launcher_foreground" />
@@ -41,12 +43,13 @@
             android:id="@+id/createdTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="дата"
             android:textAlignment="viewEnd"
+
             android:textColor="@color/colorGrey"
 
             android:textSize="10sp"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -54,29 +57,45 @@
             android:id="@+id/authorNameTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:text="Вадим"
             android:textColor="@color/colorBlack"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/avatarIv"
+            app:layout_constraintStart_toEndOf="@id/avatarIv"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/contentTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="некая идея"
-            android:textColor="@color/colorBlack"
 
+            android:textColor="@color/colorBlack"
             android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/linkBtn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/avatarIv" />
+        <ImageButton
+            android:id="@+id/linkBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="6dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toBottomOf="@id/createdTv"
+            app:layout_constraintStart_toEndOf="@id/contentTv"
+            app:layout_constraintEnd_toEndOf="parent"
+             />
 
         <FrameLayout
             android:id="@+id/mediaContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:padding="8dp"
             app:layout_constraintBottom_toTopOf="@id/likeButton"
             app:layout_constraintEnd_toEndOf="parent"
@@ -84,11 +103,11 @@
             app:layout_constraintTop_toBottomOf="@id/contentTv">
 
             <ImageView
-                android:id="@+id/photoImg"
+                android:id="@+id/photoIv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                app:layout_constraintHeight_max="400dp" />
+                app:layout_constraintHeight_max="100dp"/>
         </FrameLayout>
 
 
@@ -131,12 +150,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toStartOf="@id/viewActers"
+            app:layout_constraintEnd_toStartOf="@id/showVotesBtn"
             app:layout_constraintStart_toEndOf="@id/dislikeButton"
             app:layout_constraintTop_toBottomOf="@id/mediaContainer" />
 
         <ImageButton
-            android:id="@+id/viewActers"
+            android:id="@+id/showVotesBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

@@ -1,7 +1,8 @@
 package arsh.dazibao.dto
 
 data class IdeaRequestDto(
-    val text: String,
+    val id:Long,
+    val content: String,
     val attachmentImage: String?,
     val attachmentLink: String?
 )
