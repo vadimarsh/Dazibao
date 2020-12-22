@@ -10,7 +10,11 @@ import arsh.dazibao.model.MediaType
 import arsh.dazibao.model.Vote
 import arsh.dazibao.model.VoteType
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.idea_item.view.*
 import kotlinx.android.synthetic.main.vote_item.view.*
+import kotlinx.android.synthetic.main.vote_item.view.authorNameTv
+import kotlinx.android.synthetic.main.vote_item.view.avatarIv
+import kotlinx.android.synthetic.main.vote_item.view.createdTv
 
 
 class VoteItemViewHolder(val adapter: VotesListAdapter, val view: View) :
@@ -31,7 +35,6 @@ class VoteItemViewHolder(val adapter: VotesListAdapter, val view: View) :
                 }
             }*/
             if (vote.avatar != null) {
-                Log.d("zzz", "avatarloading:" + vote.avatar.url)
                 when (vote.avatar.mediaType) {
                     MediaType.IMAGE -> loadImageAvatar(avatarIv, vote.avatar.url)
                 }
@@ -40,6 +43,13 @@ class VoteItemViewHolder(val adapter: VotesListAdapter, val view: View) :
             }
             createdTv.text = vote.date
 
+            authorNameTv.setOnClickListener{
+                val currentPosition = adapterPosition
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    val item = adapter.votes[currentPosition]
+                    adapter.authorClickListener?.onAuthorClicked(item.authorId, currentPosition)
+                }
+            }
             when {
                 vote.action == VoteType.LIKE -> {
                     actionIv.setImageResource(R.drawable.like_active)

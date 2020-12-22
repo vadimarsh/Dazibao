@@ -4,11 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import arsh.dazibao.R
+import arsh.dazibao.model.Idea
 import arsh.dazibao.model.Vote
 
 class VotesListAdapter(val votes:MutableList<Vote>):
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
+    var authorClickListener: IdeasListAdapter.OnAuthorClickListener?=null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val voteItemView =

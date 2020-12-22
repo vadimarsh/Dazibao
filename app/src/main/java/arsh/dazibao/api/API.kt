@@ -46,6 +46,9 @@ interface API {
     @GET("api/v1/posts/{id}/votes")
     suspend fun getVotes(@Path("id") idIdea: Long): Response<List<Vote>>
 
+    @GET("api/v1/posts/author/{id}")
+    suspend fun getIdeasByAuthor(@Path("id") authorId: Long):Response<List<Idea>>
+
     /*@POST("api/v1/posts/share/{id}")
     suspend fun sharePost(
         @Path("id") id: Long,

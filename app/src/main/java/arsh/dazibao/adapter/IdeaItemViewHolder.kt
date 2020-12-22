@@ -18,7 +18,14 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
 
     fun bind(idea: Idea) {
         with(view) {
-            showVotesBtn.setOnClickListener{
+            authorNameTv.setOnClickListener {
+                val currentPosition = adapterPosition
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    val item = adapter.items[currentPosition]
+                    adapter.authorClickListener?.onAuthorClicked(item.authorId, currentPosition)
+                }
+            }
+            showVotesBtn.setOnClickListener {
                 val currentPosition = adapterPosition
                 if (currentPosition != RecyclerView.NO_POSITION) {
                     val item = adapter.items[currentPosition]
@@ -63,13 +70,12 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
                     textBadge.setTextColor(ContextCompat.getColor(context, R.color.colorGreen))
                 }
             }*/
-            if(idea.avatar!=null) {
-                Log.d("zzz","avatarloading:"+idea.avatar.url)
+            if (idea.avatar != null) {
+                Log.d("zzz", "avatarloading:" + idea.avatar.url)
                 when (idea.avatar.mediaType) {
                     MediaType.IMAGE -> loadImageAvatar(avatarIv, idea.avatar.url)
                 }
-            }
-            else {
+            } else {
                 avatarIv.setImageResource(R.drawable.avatar_default)
             }
             createdTv.text = idea.created
@@ -77,14 +83,17 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
             likeTv.text = idea.likes.toString()
             dislikeTv.text = idea.dislikes.toString()
             if (idea.attachment != null) {
+
+                Log.d("zzz", "attaxchloading:" + idea.attachment.id)
                 when (idea.attachment.mediaType) {
                     MediaType.IMAGE -> loadImage(photoIv, idea.attachment.url)
                 }
             } else {
                 photoIv.setImageResource(0)
             }
-            when {
-                idea.link != null -> linkBtn.setImageResource(R.drawable.ic_link)
+
+            if (idea.link != null) {
+                linkBtn.setImageResource(R.drawable.ic_link)
             }
 
 
@@ -92,30 +101,42 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
                 idea.likeActionPerforming -> likeButton.setImageResource(R.drawable.like_proc)
                 idea.likedByMe -> {
                     likeButton.setImageResource(R.drawable.like_active)
-                    likeTv.setTextColor(ContextCompat.getColor(context,
-                        R.color.colorGreen
-                    ))
+                    likeTv.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.colorGreen
+                        )
+                    )
                 }
                 else -> {
                     likeButton.setImageResource(R.drawable.like)
-                    likeTv.setTextColor(ContextCompat.getColor(context,
-                        R.color.colorBlack
-                    ))
+                    likeTv.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.colorBlack
+                        )
+                    )
                 }
             }
             when {
                 idea.disLikeActionPerforming -> dislikeButton.setImageResource(R.drawable.dislike_proc)
                 idea.dislikedByMe -> {
                     dislikeButton.setImageResource(R.drawable.dislike_active)
-                    dislikeTv.setTextColor(ContextCompat.getColor(context,
-                        R.color.colorRed
-                    ))
+                    dislikeTv.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.colorRed
+                        )
+                    )
                 }
                 else -> {
                     dislikeButton.setImageResource(R.drawable.dislike)
-                    dislikeTv.setTextColor(ContextCompat.getColor(context,
-                        R.color.colorBlack
-                    ))
+                    dislikeTv.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.colorBlack
+                        )
+                    )
                 }
             }
         }
@@ -143,6 +164,7 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
             .load(url)
             .into(photoImg)
     }
+
     private fun loadImageAvatar(avatarImg: ImageView, url: String) {
         Glide.with(avatarImg.context)
             .load(url)

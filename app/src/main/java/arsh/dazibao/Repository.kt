@@ -78,4 +78,8 @@ class Repository(private val api: API) {
     }
     suspend fun getVotes(idIdea: Long) =
         api.getVotes(idIdea)
+
+    suspend fun getIdeasByAuthor(authorId: Long) =
+        api.getIdeasByAuthor(authorId)
+
 }

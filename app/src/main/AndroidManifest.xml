@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NewIdeaActivity"></activity>
+        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".NewIdeaActivity" />
         <activity android:name=".VotesListActivity" />
         <activity android:name=".MainActivity" />
         <activity
