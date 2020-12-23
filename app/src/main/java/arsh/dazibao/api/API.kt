@@ -2,9 +2,11 @@ package com.example.arshkotlin9.api
 
 import arsh.dazibao.dto.AuthRequestParams
 import arsh.dazibao.dto.IdeaRequestDto
+import arsh.dazibao.dto.PassChangeRequestParams
 import arsh.dazibao.dto.RegistrationRequestParams
 import arsh.dazibao.model.Attachment
 import arsh.dazibao.model.Idea
+import arsh.dazibao.model.User
 import arsh.dazibao.model.Vote
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -60,6 +62,13 @@ interface API {
     suspend fun uploadImage(@Part file: MultipartBody.Part):
             Response<Attachment>
 
+    @GET("api/v1/me")
+    suspend fun getMe(): Response<User>
 
+    @POST("api/v1/me/changepswd")
+    suspend fun changePswd(@Body passwordChangeRequestDto: PassChangeRequestParams): Response<Token>
+
+    @POST("api/v1/me/avatar")
+    suspend fun setAvatar(@Body attachment: Attachment):Response<Void>
 
 }

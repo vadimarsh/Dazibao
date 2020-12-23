@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import arsh.dazibao.adapter.IdeasListAdapter
 import arsh.dazibao.adapter.VotesListAdapter
 import arsh.dazibao.model.Vote
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_votes_list.*
+import kotlinx.android.synthetic.main.activity_votes_list.mainTb
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import splitties.toast.toast
@@ -21,6 +23,7 @@ class VotesListActivity : AppCompatActivity(), IdeasListAdapter.OnAuthorClickLis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_votes_list)
+        setSupportActionBar(mainTb)
     }
     override fun onAuthorClicked(authorId: Long, position: Int) {
         val intent = Intent(this@VotesListActivity, MainActivity::class.java)

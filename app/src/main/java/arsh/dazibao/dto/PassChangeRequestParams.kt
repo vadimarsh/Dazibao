@@ -1,3 +1,3 @@
 package arsh.dazibao.dto
 
-data class PassChangeRequestParams(val oldpswd: String, val newpswd: String)
+data class PassChangeRequestParams(val old: String, val new: String)

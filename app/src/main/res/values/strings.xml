@@ -5,7 +5,7 @@
     <string name="hint_login">Логин</string>
     <string name="hint_pass">Пароль</string>
     <string name="hint_pass_rep">Повторите пароль</string>
-    <string name="but_confirm">Создать аккаунт</string>
+    <string name="but_confirm">Подтвердить</string>
 
     <string name="succes_reg">Регистрация прошла успешно</string>
     <string name="error_reg">Ошибка</string>
@@ -25,4 +25,5 @@
     <string name="hint_idea_url">Введите URL</string>
     <string name="msg_already_voted">Вы уже отдали свой голос</string>
     <string name="like_in_progress">Обработка голоса</string>
+    <string name="hint_old_pswd">Введите старый пароль</string>
 </resources>

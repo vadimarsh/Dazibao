@@ -3,13 +3,12 @@ package arsh.dazibao
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.method.TextKeyListener.clear
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_start.*
+import kotlinx.android.synthetic.main.activity_start.mainTb
 import kotlinx.coroutines.launch
 import splitties.activities.start
 import splitties.toast.toast
@@ -18,6 +17,7 @@ class StartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
+        setSupportActionBar(mainTb)
         if (isAuthenticated()) {
             start<MainActivity>()
             finish()

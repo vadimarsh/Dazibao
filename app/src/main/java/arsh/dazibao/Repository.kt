@@ -3,6 +3,7 @@ package arsh.dazibao
 import android.graphics.Bitmap
 import arsh.dazibao.dto.AuthRequestParams
 import arsh.dazibao.dto.IdeaRequestDto
+import arsh.dazibao.dto.PassChangeRequestParams
 import arsh.dazibao.dto.RegistrationRequestParams
 import arsh.dazibao.model.Attachment
 import com.example.arshkotlin9.api.*
@@ -81,5 +82,11 @@ class Repository(private val api: API) {
 
     suspend fun getIdeasByAuthor(authorId: Long) =
         api.getIdeasByAuthor(authorId)
+
+    suspend fun getMe()= api.getMe()
+
+    suspend fun changePswd(oldPassword: String, newPassword: String) = api.changePswd(PassChangeRequestParams(oldPassword,newPassword))
+    suspend fun setAvatar(attachment: Attachment) = api.setAvatar(attachment)
+
 
 }

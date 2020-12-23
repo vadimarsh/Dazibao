@@ -1,10 +1,14 @@
 package arsh.dazibao
 
+import android.content.Context
+import androidx.core.content.edit
 import java.util.*
 import java.util.regex.Pattern
 
 fun isValid(password: String) =
     Pattern.compile("(?!.*[^a-zA-Z0-9])(.{6,})\$").matcher(password).matches()
+
+
 
 fun dateToStr(time: Int): String {
     val timel : Long = time.toLong()*1000;

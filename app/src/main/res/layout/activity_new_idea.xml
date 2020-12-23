@@ -5,6 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".NewIdeaActivity">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/mainTb"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="@dimen/elevation"
+        android:gravity="end"
+        android:textAlignment="viewEnd"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+
+    </androidx.appcompat.widget.Toolbar>
     <TextView
         android:id="@+id/createNewPostLabel"
         android:layout_width="0dp"
@@ -15,7 +33,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/mainTb" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/contentTil"
@@ -45,7 +63,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:hint="@string/hint_idea_url"
-        app:layout_constraintBottom_toTopOf="@id/attachPhotoImg"
+        app:layout_constraintBottom_toTopOf="@id/attachPhotoIv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/contentTil">
@@ -60,7 +78,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
     <ImageView
-        android:id="@+id/attachPhotoImg"
+        android:id="@+id/attachPhotoIv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"

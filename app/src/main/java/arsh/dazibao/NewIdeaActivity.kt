@@ -10,7 +10,9 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import arsh.dazibao.model.Attachment
 import arsh.dazibao.model.Idea
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_new_idea.*
+import kotlinx.android.synthetic.main.activity_new_idea.mainTb
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import splitties.toast.toast
@@ -25,14 +27,16 @@ class NewIdeaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_idea)
+        setSupportActionBar(mainTb)
+
         if (intent.extras != null) {
             idSource = intent.extras!!.getLong("id")
-            attachPhotoImg.visibility = View.GONE
+            attachPhotoIv.visibility = View.GONE
         } else {
-            attachPhotoImg.visibility = View.VISIBLE
+            attachPhotoIv.visibility = View.VISIBLE
         }
 
-        attachPhotoImg.setOnClickListener {
+        attachPhotoIv.setOnClickListener {
             dispatchTakePictureIntent()
         }
         createIdeaBtn.setOnClickListener {
@@ -119,7 +123,7 @@ class NewIdeaActivity : AppCompatActivity() {
     }
 
     private fun transparetAllIcons() {
-        attachPhotoImg.setImageResource(R.drawable.ic_photo)
+        attachPhotoIv.setImageResource(R.drawable.ic_photo)
     }
 
     private fun createProgressDialog(): ProgressDialog? {

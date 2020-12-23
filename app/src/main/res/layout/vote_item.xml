@@ -41,10 +41,10 @@
 
         <ImageView
             android:id="@+id/avatarIv"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
             android:layout_marginStart="8dp"
-            app:layout_constraintHeight_max="56dp"
+            app:layout_constraintHeight_max="@dimen/avatar_size"
             app:layout_constraintStart_toEndOf="@id/actionIv"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_launcher_foreground" />

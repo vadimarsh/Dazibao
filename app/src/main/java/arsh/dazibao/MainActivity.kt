@@ -20,15 +20,21 @@ import splitties.toast.toast
 class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
     IdeasListAdapter.OnShowVotesClickListener, IdeasListAdapter.OnLoadMoreBtnClickListener,
     IdeasListAdapter.OnAuthorClickListener
-//    PostAdapter.OnLoadMoreBtnClickListener
+
+//todo сделать норм меню на аппбаре
+//todo сделать запрет на добавление новых для только чтения
+//todo сделать пуши
+
 {
 
     private var dialog: ProgressDialog? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(mainTb)
         swipeLayout.setOnRefreshListener { refreshPosts() }
         fab.setOnClickListener { start<NewIdeaActivity>() }
+        settingBut.setOnClickListener{start<SettingsActivity>()}
     }
 
     private fun refreshPosts() {
@@ -56,6 +62,7 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
 
             val authorId = intent.getLongExtra("authorId", 0L)
             val result: Response<List<Idea>> = if (authorId != 0L) {
+                fab.visibility = View.GONE
                 App.repository.getIdeasByAuthor(authorId = authorId)
             } else {
                 App.repository.getIdeasRecent()
@@ -153,7 +160,6 @@ override fun onAuthorClicked(authorId: Long, position: Int) {
     val intent = Intent(this@MainActivity, MainActivity::class.java)
     intent.putExtra("authorId", authorId)
     startActivity(intent)
-    finish()
 }
 
 }

@@ -73,7 +73,7 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
             if (idea.avatar != null) {
                 Log.d("zzz", "avatarloading:" + idea.avatar.url)
                 when (idea.avatar.mediaType) {
-                    MediaType.IMAGE -> loadImageAvatar(avatarIv, idea.avatar.url)
+                    MediaType.IMAGE -> loadImage(avatarIv, idea.avatar.url)
                 }
             } else {
                 avatarIv.setImageResource(R.drawable.avatar_default)
@@ -165,9 +165,5 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
             .into(photoImg)
     }
 
-    private fun loadImageAvatar(avatarImg: ImageView, url: String) {
-        Glide.with(avatarImg.context)
-            .load(url)
-            .into(avatarImg)
-    }
+
 }

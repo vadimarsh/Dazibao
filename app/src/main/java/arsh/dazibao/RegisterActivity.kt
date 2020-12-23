@@ -7,7 +7,9 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_register.*
+import kotlinx.android.synthetic.main.activity_register.mainTb
 import kotlinx.android.synthetic.main.activity_start.but_reg
 import kotlinx.android.synthetic.main.activity_start.et_login
 import kotlinx.android.synthetic.main.activity_start.progressBar
@@ -19,6 +21,8 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+        setSupportActionBar(mainTb)
+
         but_reg.setOnClickListener {
             val password = et_pswd.text.toString()
             val repeatedPassword = et_pswdr.text.toString()
