@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "114014868663",
+    "project_id": "dadzibao",
+    "storage_bucket": "dadzibao.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114014868663:android:1cf9b50eaf143c84b12932",
+        "android_client_info": {
+          "package_name": "arsh.dazibao"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114014868663-gbkksmo4kk4bmfqfblvmpcbcths67a2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB49bMcZviFhCQSQ-O3lhvpVRbxOOi27nE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114014868663-gbkksmo4kk4bmfqfblvmpcbcths67a2b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

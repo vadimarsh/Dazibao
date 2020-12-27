@@ -48,7 +48,7 @@ class RegisterActivity : AppCompatActivity() {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         if (response.isSuccessful) {
                             toast(R.string.succes_reg)
-                            setUserAuth(response.body()!!.token)
+                            setUserAuth(response.body()!!.token,this@RegisterActivity)
                             finish()
                         } else {
                             longToast(R.string.error_reg)
@@ -60,10 +60,4 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun setUserAuth(token: String) =
-        getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE)
-            .edit() {
-                putString(AUTHENTICATED_SHARED_KEY, token)
-            }
 }

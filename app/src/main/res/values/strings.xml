@@ -26,4 +26,8 @@
     <string name="msg_already_voted">Вы уже отдали свой голос</string>
     <string name="like_in_progress">Обработка голоса</string>
     <string name="hint_old_pswd">Введите старый пароль</string>
+    <string name="notify">Notify</string>
+    <string name="description_text">Description text</string>
+    <string name="push_token_failed">Пуш не был отправлен</string>
+    <string name="msg_no_googleapi">Сервисы гуглапи не доступны</string>
 </resources>

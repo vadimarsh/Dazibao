@@ -71,4 +71,6 @@ interface API {
     @POST("api/v1/me/avatar")
     suspend fun setAvatar(@Body attachment: Attachment):Response<Void>
 
+    @POST("api/v1/me/fb-token")
+    suspend fun firebasePushToken(@Body token: Token): Response<Void>
 }

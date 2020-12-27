@@ -21,14 +21,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-        <ImageButton
-            android:id="@+id/settingBut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/icon_settings"
-            android:layout_marginStart="16dp"/>
-
     </androidx.appcompat.widget.Toolbar>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeLayout"

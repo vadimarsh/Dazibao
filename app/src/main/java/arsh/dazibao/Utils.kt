@@ -8,6 +8,26 @@ import java.util.regex.Pattern
 fun isValid(password: String) =
     Pattern.compile("(?!.*[^a-zA-Z0-9])(.{6,})\$").matcher(password).matches()
 
+fun setUserAuth(token: String, context: Context ) =
+    context.getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE).edit{
+        putString(AUTHENTICATED_SHARED_KEY, token)
+    }
+fun getUserAuth(context: Context): String? =
+    context
+        .getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE)
+        .getString(AUTHENTICATED_SHARED_KEY, null)
+
+fun isAuthenticated(context: Context) =
+    context.getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE).getString(
+        AUTHENTICATED_SHARED_KEY, ""
+    )?.isNotEmpty() ?: false
+
+fun cleanUserAuth(context: Context) =
+    context.getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE).edit{
+
+        clear()
+
+    }
 
 
 fun dateToStr(time: Int): String {

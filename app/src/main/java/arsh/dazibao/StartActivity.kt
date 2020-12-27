@@ -1,11 +1,9 @@
 package arsh.dazibao
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_start.*
 import kotlinx.android.synthetic.main.activity_start.mainTb
@@ -18,7 +16,7 @@ class StartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
         setSupportActionBar(mainTb)
-        if (isAuthenticated()) {
+        if (isAuthenticated(this)) {
             start<MainActivity>()
             finish()
         } else {
@@ -44,7 +42,7 @@ class StartActivity : AppCompatActivity() {
                                 )
                             if (response.isSuccessful && response.code() != 400) {
                                 toast(getString(R.string.msg_auth_succ))
-                                setUserAuth(response.body()!!.token)
+                                setUserAuth(response.body()!!.token,this@StartActivity)
 
                                 start<MainActivity>()
                                 finish()
@@ -67,27 +65,13 @@ class StartActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (isAuthenticated()) {
+        if (isAuthenticated(this)) {
             start<MainActivity>()
             finish()
         }
     }
 
-    private fun setUserAuth(token: String) =
-        getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE).edit{
-                putString(AUTHENTICATED_SHARED_KEY, token)
-            }
 
 
-    private fun isAuthenticated() =
-        getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE).getString(
-            AUTHENTICATED_SHARED_KEY, ""
-        )?.isNotEmpty() ?: false
 
-    private fun cleanUserAuth() =
-        getSharedPreferences(API_SHARED_FILE, Context.MODE_PRIVATE).edit{
-
-                clear()
-
-        }
 }

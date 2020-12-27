@@ -88,5 +88,7 @@ class Repository(private val api: API) {
     suspend fun changePswd(oldPassword: String, newPassword: String) = api.changePswd(PassChangeRequestParams(oldPassword,newPassword))
     suspend fun setAvatar(attachment: Attachment) = api.setAvatar(attachment)
 
+    suspend fun firebasePushToken(token: Token): Response<Void> = api.firebasePushToken(token)
+
 
 }

@@ -55,7 +55,10 @@ class SettingsActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val user = response.body()!!
                     authorNameTv.text = user.username
-                    //rankTv.text = user.type.toString()
+                    if(user.onlyReader){
+                        rankTv.text = "Только просмотр и голосование"
+                    }else{
+                        rankTv.text = "Полноправный автор"}
                     if (user.avatar != null) {
                         loadImage(avatarIv, user.avatar.url)
                     }
