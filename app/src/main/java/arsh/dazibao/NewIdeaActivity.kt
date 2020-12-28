@@ -3,25 +3,32 @@ package arsh.dazibao
 import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import arsh.dazibao.model.Attachment
 import arsh.dazibao.model.Idea
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_new_idea.*
+import kotlinx.android.synthetic.main.activity_new_idea.attachPhotoIv
 import kotlinx.android.synthetic.main.activity_new_idea.mainTb
+import kotlinx.android.synthetic.main.activity_new_idea.photoSw
+import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import splitties.toast.toast
 import java.io.IOException
 
 class NewIdeaActivity : AppCompatActivity() {
+    private companion object {
+        const val REQUEST_IMAGE_CAPTURE = 1
+        const val GALLERY_REQUEST = 2
+    }
+
     private var dialog: ProgressDialog? = null
     private var idSource: Long = -1L
-    val REQUEST_IMAGE_CAPTURE = 1
     private var attachmentModel: Attachment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,40 +49,39 @@ class NewIdeaActivity : AppCompatActivity() {
         createIdeaBtn.setOnClickListener {
             lifecycleScope.launch {
 
-
-                // Показываем крутилку
                 dialog = ProgressDialog(this@NewIdeaActivity).apply {
                     setMessage(this@NewIdeaActivity.getString(R.string.please_wait))
-                    setTitle(R.string.create_new_idea)
+                    setTitle(R.string.txt_create_new_idea)
                     setCancelable(false)
                     setProgressBarIndeterminate(true)
                     show()
                 }
-                // Обворачиваем в try catch, потому что возможны ошибки при соединении с сетью
                 try {
                     val result: Response<Idea>
-                       if (attachmentModel != null) {
-                            result = App.repository.addNewIdea(
+                    if (attachmentModel != null && contentEdt.text.toString().isNotEmpty()) {
+                        result = if (linkEdt.text.toString().isNotEmpty()) {
+                            App.repository.addNewIdea(
                                 content = contentEdt.text.toString(),
-                                attid = attachmentModel?.id,
+                                attid = attachmentModel!!.id,
                                 link = linkEdt.text.toString()
                             )
-                            attachmentModel == null
                         } else {
-                            result = App.repository.addNewIdea(
-                                contentEdt.text.toString()
+                            App.repository.addNewIdea(
+                                content = contentEdt.text.toString(),
+                                attid = attachmentModel!!.id
                             )
                         }
-                    if (result.isSuccessful) {
-                        handleSuccessfullResult()
+                        if (result.isSuccessful) {
+                            handleSuccessfullResult()
+                        } else {
+                            handleFailedResult()
+                        }
                     } else {
-                        handleFailedResult()
+                        toast(getString(R.string.msg_err_content_att))
                     }
                 } catch (e: IOException) {
-                    // обрабатываем ошибку
                     handleFailedResult()
                 } finally {
-                    // закрываем диалог
                     dialog?.dismiss()
                 }
 
@@ -84,12 +90,12 @@ class NewIdeaActivity : AppCompatActivity() {
     }
 
     private fun handleSuccessfullResult() {
-        toast(R.string.idea_created_success)
+        toast(R.string.msg_idea_created_success)
         finish()
     }
 
     private fun handleFailedResult() {
-        toast(R.string.error_occured)
+        toast(R.string.msg_err)
     }
 
     override fun onActivityResult(
@@ -99,18 +105,29 @@ class NewIdeaActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap?
-            imageBitmap?.let {
-                lifecycleScope.launch {
+            sendImage(imageBitmap)
 
-                    dialog = createProgressDialog()
-                    val imageUploadResult = App.repository.upload(it)
-                    dialog?.dismiss()
-                    if (imageUploadResult.isSuccessful) {
-                        imageUploaded()
-                        attachmentModel = imageUploadResult.body()
-                    } else {
-                        toast("Can't upload image")
-                    }
+        } else if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK) {
+            val selectedImage = data?.data
+            val imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage)
+            sendImage(imageBitmap)
+        }
+    }
+
+    private fun sendImage(imageBitmap: Bitmap?) {
+        imageBitmap?.let {
+            lifecycleScope.launch {
+
+                dialog = createProgressDialog()
+                val imageUploadResult = App.repository.upload(it)
+                dialog?.dismiss()
+                if (imageUploadResult.isSuccessful) {
+                    imageUploaded()
+                    attachmentModel = imageUploadResult.body()
+
+                    toast(getString(R.string.msg_sucs_send_img))
+                } else {
+                    toast(getString(R.string.msg_err_cant_send_img))
                 }
             }
         }
@@ -118,8 +135,6 @@ class NewIdeaActivity : AppCompatActivity() {
 
     private fun imageUploaded() {
         transparetAllIcons()
-        // Показываем красную галочку над фото
-        //attachPhotoDoneImg.visibility = View.VISIBLE
     }
 
     private fun transparetAllIcons() {
@@ -129,7 +144,7 @@ class NewIdeaActivity : AppCompatActivity() {
     private fun createProgressDialog(): ProgressDialog? {
         return ProgressDialog(this@NewIdeaActivity).apply {
             setMessage(this@NewIdeaActivity.getString(R.string.please_wait))
-            setTitle(R.string.create_new_idea)
+            setTitle(R.string.txt_create_new_idea)
             setCancelable(false)
             setProgressBarIndeterminate(true)
             show()
@@ -137,10 +152,23 @@ class NewIdeaActivity : AppCompatActivity() {
     }
 
     private fun dispatchTakePictureIntent() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(packageManager)?.also {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        if (photoSw.isChecked) {
+            Intent(Intent.ACTION_PICK).also { photoPickerIntent ->
+                photoPickerIntent.type = "image/*"
+                startActivityForResult(photoPickerIntent, GALLERY_REQUEST)
+            }
+
+        } else {
+            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+                takePictureIntent.resolveActivity(packageManager)?.also {
+                    startActivityForResult(
+                        takePictureIntent,
+                        REQUEST_IMAGE_CAPTURE
+                    )
+                }
             }
         }
     }
+
+
 }

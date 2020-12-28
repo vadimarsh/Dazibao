@@ -63,7 +63,7 @@ class SettingsActivity : AppCompatActivity() {
                         loadImage(avatarIv, user.avatar.url)
                     }
                 } else {
-                    toast(R.string.error_occured)
+                    toast(R.string.msg_err)
                 }
             } catch (e: IOException) {
                 toast(R.string.msg_connection_err)
@@ -95,7 +95,7 @@ class SettingsActivity : AppCompatActivity() {
                             setUserAuth(response.body()!!.token)
                             toast("Пароль изменен успешно")
                         } else {
-                            toast(R.string.error_occured)
+                            toast(R.string.msg_err)
                         }
                     } catch (e: Exception) {
                         toast(R.string.msg_connection_err)
@@ -163,7 +163,7 @@ class SettingsActivity : AppCompatActivity() {
                             toast("Аватар установлен")
                         }
                     } else {
-                        toast(R.string.error_occured)
+                        toast(R.string.msg_err)
                     }
                 } catch (e: IOException) {
                     toast(R.string.msg_connection_err)

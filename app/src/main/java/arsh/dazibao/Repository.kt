@@ -6,7 +6,8 @@ import arsh.dazibao.dto.IdeaRequestDto
 import arsh.dazibao.dto.PassChangeRequestParams
 import arsh.dazibao.dto.RegistrationRequestParams
 import arsh.dazibao.model.Attachment
-import com.example.arshkotlin9.api.*
+import com.example.arshkotlin9.api.API
+import com.example.arshkotlin9.api.Token
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -14,17 +15,6 @@ import retrofit2.Response
 import java.io.ByteArrayOutputStream
 
 class Repository(private val api: API) {
-
-//    private val retrofit: Retrofit by lazy {
-//        val client = OkHttpClient.Builder()
-//            .addInterceptor(App.authTokenInterceptor)
-//            .build()
-//        Retrofit.Builder()
-//            .baseUrl(SERVER_URL)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//    }
-
 
     suspend fun authenticate(login: String, password: String): Response<Token> {
         val token: Response<Token> =
@@ -40,13 +30,10 @@ class Repository(private val api: API) {
             )
         )
 
-    suspend fun getPosts() =
-        api.getAllIdeas()
-
     suspend fun getIdeasRecent() =
         api.getRecent()
 
-    suspend fun getPostsAfter(id: Long) =
+    suspend fun getIdeasAfter(id: Long) =
         api.after(id)
 
     suspend fun getPostsBefore(id: Long) =
@@ -58,10 +45,24 @@ class Repository(private val api: API) {
     suspend fun dislikeIdea(id: Long) =
         api.dislikeIdea(id)
 
-    suspend fun addNewIdea(content: String, attid: String?,link: String?) =
-        api.createIdea(IdeaRequestDto(id=-1,content = content, attachmentImage = attid,attachmentLink = link))
+    suspend fun addNewIdea(content: String, attid: String, link: String?) =
+        api.createIdea(
+            IdeaRequestDto(
+                id = -1,
+                content = content,
+                attachmentImage = attid,
+                attachmentLink = link
+            )
+        )
 
-    suspend fun addNewIdea(content: String) = api.createIdea(IdeaRequestDto(id=-1,content = content,attachmentImage = "",attachmentLink = ""))
+    suspend fun addNewIdea(content: String, attid: String) = api.createIdea(
+        IdeaRequestDto(
+            id = -1,
+            content = content,
+            attachmentImage = attid,
+            attachmentLink = null
+        )
+    )
 
     suspend fun upload(bitmap: Bitmap): Response<Attachment> {
         // Создаем поток байтов
@@ -77,15 +78,18 @@ class Repository(private val api: API) {
             MultipartBody.Part.createFormData("file", "image.jpg", reqFIle)
         return api.uploadImage(body)
     }
+
     suspend fun getVotes(idIdea: Long) =
         api.getVotes(idIdea)
 
     suspend fun getIdeasByAuthor(authorId: Long) =
         api.getIdeasByAuthor(authorId)
 
-    suspend fun getMe()= api.getMe()
+    suspend fun getMe() = api.getMe()
 
-    suspend fun changePswd(oldPassword: String, newPassword: String) = api.changePswd(PassChangeRequestParams(oldPassword,newPassword))
+    suspend fun changePswd(oldPassword: String, newPassword: String) =
+        api.changePswd(PassChangeRequestParams(oldPassword, newPassword))
+
     suspend fun setAvatar(attachment: Attachment) = api.setAvatar(attachment)
 
     suspend fun firebasePushToken(token: Token): Response<Void> = api.firebasePushToken(token)

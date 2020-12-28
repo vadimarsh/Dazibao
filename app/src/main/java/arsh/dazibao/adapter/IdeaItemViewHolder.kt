@@ -1,5 +1,7 @@
 package arsh.dazibao.adapter
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -39,7 +41,7 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
                 if (currentPosition != RecyclerView.NO_POSITION) {
                     val item = adapter.items[currentPosition]
                     if (item.likeActionPerforming) {
-                        context.toast(context.getString(R.string.like_in_progress))
+                        context.toast(context.getString(R.string.msg_like_in_progress))
                     } else {
                         adapter.voteBtnClickListener?.onLikeBtnClicked(item, currentPosition)
 
@@ -51,7 +53,7 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
                 if (currentPosition != RecyclerView.NO_POSITION) {
                     val item = adapter.items[currentPosition]
                     if (item.disLikeActionPerforming) {
-                        context.toast(context.getString(R.string.like_in_progress))
+                        context.toast(context.getString(R.string.msg_like_in_progress))
                     } else {
                         adapter.voteBtnClickListener?.onDisLikeBtnClicked(item, currentPosition)
                         Log.d("zzz", "дизЛайк проведен!")
@@ -60,16 +62,6 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
             }
 
             authorNameTv.text = idea.authorName
-            /*when (idea.userType) {
-                UserType.HATER -> {
-                    textBadge.text = context.getString(R.string.hater)
-                    textBadge.setTextColor(ContextCompat.getColor(context, R.color.colorRed))
-                }
-                UserType.PROMOTER -> {
-                    textBadge.text = context.getString(R.string.promoter)
-                    textBadge.setTextColor(ContextCompat.getColor(context, R.color.colorGreen))
-                }
-            }*/
             if (idea.avatar != null) {
                 Log.d("zzz", "avatarloading:" + idea.avatar.url)
                 when (idea.avatar.mediaType) {
@@ -94,6 +86,18 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
 
             if (idea.link != null) {
                 linkBtn.setImageResource(R.drawable.ic_link)
+                linkBtn.visibility = View.VISIBLE
+                val uri: Uri = Uri.parse(idea.link)
+
+                linkBtn.setOnClickListener {
+                    ContextCompat.startActivity(
+                        itemView.context,
+                        Intent(Intent.ACTION_VIEW).apply { this.data = uri }, null
+                    )
+                }
+
+            } else {
+                linkBtn.visibility = View.GONE
             }
 
 

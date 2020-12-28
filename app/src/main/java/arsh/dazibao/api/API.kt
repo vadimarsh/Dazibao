@@ -12,10 +12,7 @@ import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
-
 data class Token(val token: String)
-
-
 
 interface API {
     @POST("api/v1/authentication")
@@ -33,9 +30,6 @@ interface API {
     @GET("api/v1/posts/before/{id}")
     suspend fun before(@Path("id") id: Long): Response<List<Idea>>
 
-    @GET("api/v1/posts")
-    suspend fun getAllIdeas(): Response<List<Idea>>
-
     @POST("api/v1/posts/like/{id}")
     suspend fun likeIdea(@Path("id") id: Long): Response<Idea>
 
@@ -50,12 +44,6 @@ interface API {
 
     @GET("api/v1/posts/author/{id}")
     suspend fun getIdeasByAuthor(@Path("id") authorId: Long):Response<List<Idea>>
-
-    /*@POST("api/v1/posts/share/{id}")
-    suspend fun sharePost(
-        @Path("id") id: Long,
-        @Body createPostRequest: PostRequest
-    ): Response<Idea>*/
 
     @Multipart
     @POST("api/v1/media")

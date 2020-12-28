@@ -52,12 +52,12 @@
         app:layout_constraintTop_toBottomOf="@+id/authorNameTv"
         android:text="Hater" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/photoSw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Добавить фото из галерии"
+        android:text="@string/txt_sw_add_photo_gal"
 
         app:layout_constraintEnd_toEndOf="@id/attachPhotoIv"
         app:layout_constraintHorizontal_bias="0"

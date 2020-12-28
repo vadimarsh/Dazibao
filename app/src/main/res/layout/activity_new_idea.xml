@@ -28,7 +28,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/create_new_idea"
+        android:text="@string/txt_create_new_idea"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +41,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:hint="@string/enter_idea_content"
+        android:hint="@string/txt_enter_idea_content"
         app:layout_constraintBottom_toTopOf="@id/linkTil"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,26 +77,37 @@
         android:padding="8dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/photoSw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/txt_sw_add_photo_gal"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linkTil"
+        app:layout_constraintEnd_toStartOf="@id/attachPhotoIv"
+        android:layout_marginBottom="16dp"/>
     <ImageView
         android:id="@+id/attachPhotoIv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="16dp"
         android:foreground="?android:attr/selectableItemBackground"
-        android:padding="8dp"
         android:src="@drawable/ic_add_photo"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/createIdeaBtn"
+
+        app:layout_constraintStart_toEndOf="@id/photoSw"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contentTil" />
+        app:layout_constraintTop_toBottomOf="@+id/linkTil" />
 
 
     <Button
         android:id="@+id/createIdeaBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/create_new_idea"
+        android:text="@string/txt_create_new_idea"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/photoSw"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
