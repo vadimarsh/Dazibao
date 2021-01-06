@@ -3,6 +3,7 @@ package arsh.dazibao
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.edit
@@ -23,14 +24,22 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         setSupportActionBar(mainTb)
 
+        et_pswdr.setOnKeyListener { view, i, keyEvent ->
+            ti_pswdr.error = null
+            false
+        }
+        et_pswd.setOnKeyListener { view, i, keyEvent ->
+            ti_pswdr.error = null
+            false
+        }
         but_reg.setOnClickListener {
             val password = et_pswd.text.toString()
             val repeatedPassword = et_pswdr.text.toString()
             if (password != repeatedPassword) {
-                et_pswdr.error = getString(R.string.msg_difpsw_err)
+                ti_pswdr.error = getString(R.string.msg_difpsw_err)
 
             } else if (!isValid(password) || (password.isEmpty())) {
-                et_pswdr.error = getString(R.string.msg_paswd_invalid_err)
+                ti_pswdr.error = getString(R.string.msg_paswd_invalid_err)
 
             } else {
                 lifecycleScope.launch {
@@ -43,19 +52,21 @@ class RegisterActivity : AppCompatActivity() {
                     )
                     try {
                         val response = App.repository.register(et_login.text.toString(), password)
-
-                        progressBar.visibility = View.GONE
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         if (response.isSuccessful) {
                             toast(R.string.succes_reg)
                             setUserAuth(response.body()!!.token,this@RegisterActivity)
                             finish()
                         } else {
-                            longToast(R.string.error_reg)
+                            longToast(getString(R.string.msg_err_login_alrdy_exist))
                         }
                     } catch (e: Exception) {
                         toast(getString(R.string.msg_connection_err))
                     }
+                    finally {
+                        progressBar.visibility = View.GONE
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                    }
+
                 }
             }
         }

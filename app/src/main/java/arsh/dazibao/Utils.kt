@@ -21,3 +21,12 @@ fun isAuthenticated(context: Context) =
         AUTHENTICATED_SHARED_KEY, ""
     )?.isNotEmpty() ?: false
 
+fun clearUserAuth(context:Context){
+    val sharedPrefs = context.getSharedPreferences(API_SHARED_FILE,Context.MODE_PRIVATE)
+    if (sharedPrefs.contains(AUTHENTICATED_SHARED_KEY).not()) {
+        return
+    }
+    sharedPrefs.edit {
+        remove(AUTHENTICATED_SHARED_KEY)
+    }
+}

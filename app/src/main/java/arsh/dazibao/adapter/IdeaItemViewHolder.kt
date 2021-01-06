@@ -18,6 +18,8 @@ import splitties.toast.toast
 class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
     RecyclerView.ViewHolder(view) {
 
+
+
     fun bind(idea: Idea) {
         with(view) {
             authorNameTv.setOnClickListener {
@@ -63,7 +65,6 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
 
             authorNameTv.text = idea.authorName
             if (idea.avatar != null) {
-                Log.d("zzz", "avatarloading:" + idea.avatar.url)
                 when (idea.avatar.mediaType) {
                     MediaType.IMAGE -> loadImage(avatarIv, idea.avatar.url)
                 }
@@ -75,8 +76,6 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
             likeTv.text = idea.likes.toString()
             dislikeTv.text = idea.dislikes.toString()
             if (idea.attachment != null) {
-
-                Log.d("zzz", "attaxchloading:" + idea.attachment.id)
                 when (idea.attachment.mediaType) {
                     MediaType.IMAGE -> loadImage(photoIv, idea.attachment.url)
                 }
@@ -146,23 +145,56 @@ class IdeaItemViewHolder(val adapter: IdeasListAdapter, val view: View) :
         }
 
     }
-
-    /*
-        fun bindLike(idea: Idea) {
-            with(view) { *
-                when{
-                    idea.likeActionPerforming -> imageLike.setImageResource(R.drawable.like_wating)
-                    idea.isLike -> {
-                        imageLike.setImageResource(R.drawable.like_active)
-                        textLike.setTextColor(ContextCompat.getColor(context, R.color.colorGreen))
-                        textLike.text = idea.like.toString()
+    fun bindLike(idea: Idea) {
+            with(view) {
+                when {
+                    idea.likeActionPerforming -> likeButton.setImageResource(R.drawable.like_proc)
+                    idea.likedByMe -> {
+                        likeButton.setImageResource(R.drawable.like_active)
+                        likeTv.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.colorGreen
+                            )
+                        )
+                    }
+                    else -> {
+                        likeButton.setImageResource(R.drawable.like)
+                        likeTv.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.colorBlack
+                            )
+                        )
                     }
                 }
 
             }
-        }
+    }
+    fun bindDisLike(idea: Idea) {
+        with(view) {when {
+            idea.disLikeActionPerforming -> dislikeButton.setImageResource(R.drawable.dislike_proc)
+            idea.dislikedByMe -> {
+                dislikeButton.setImageResource(R.drawable.dislike_active)
+                dislikeTv.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorRed
+                    )
+                )
+            }
+            else -> {
+                dislikeButton.setImageResource(R.drawable.dislike)
+                dislikeTv.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorBlack
+                    )
+                )
+            }
+        }}
+    }
 
-     */
     private fun loadImage(photoImg: ImageView, url: String) {
         Glide.with(photoImg.context)
             .load(url)

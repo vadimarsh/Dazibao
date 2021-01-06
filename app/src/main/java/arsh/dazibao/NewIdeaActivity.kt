@@ -80,7 +80,7 @@ class NewIdeaActivity : AppCompatActivity() {
                         toast(getString(R.string.msg_err_content_att))
                     }
                 } catch (e: IOException) {
-                    handleFailedResult()
+                    toast(R.string.msg_connection_err)
                 } finally {
                     dialog?.dismiss()
                 }
@@ -117,17 +117,23 @@ class NewIdeaActivity : AppCompatActivity() {
     private fun sendImage(imageBitmap: Bitmap?) {
         imageBitmap?.let {
             lifecycleScope.launch {
+                try {
+                    dialog = createProgressDialog()
+                    val imageUploadResult = App.repository.upload(it)
+                    dialog?.dismiss()
+                    if (imageUploadResult.isSuccessful) {
+                        imageUploaded()
+                        attachmentModel = imageUploadResult.body()
 
-                dialog = createProgressDialog()
-                val imageUploadResult = App.repository.upload(it)
-                dialog?.dismiss()
-                if (imageUploadResult.isSuccessful) {
-                    imageUploaded()
-                    attachmentModel = imageUploadResult.body()
-
-                    toast(getString(R.string.msg_sucs_send_img))
-                } else {
-                    toast(getString(R.string.msg_err_cant_send_img))
+                        toast(getString(R.string.msg_sucs_send_img))
+                    } else {
+                        toast(getString(R.string.msg_err_cant_send_img))
+                    }
+                } catch (e: IOException) {
+                    toast(R.string.msg_connection_err)
+                }
+                finally {
+                    dialog?.dismiss()
                 }
             }
         }

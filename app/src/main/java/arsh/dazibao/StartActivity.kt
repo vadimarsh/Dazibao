@@ -24,7 +24,7 @@ class StartActivity : AppCompatActivity() {
                 if (!isValid(et_password.text.toString()) || (et_password.text.toString()
                         .isEmpty())
                 ) {
-                    et_password.error = getString(R.string.msg_paswd_invalid_err)
+                    ti_password.error = getString(R.string.msg_paswd_invalid_err)
                 } else {
                     lifecycleScope.launch {
                         progressBar.isIndeterminate = true

@@ -1,7 +1,6 @@
 package arsh.dazibao
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -26,18 +25,29 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
     IdeasListAdapter.OnShowVotesClickListener, IdeasListAdapter.OnLoadMoreBtnClickListener,
-    IdeasListAdapter.OnAuthorClickListener
+    IdeasListAdapter.OnAuthorClickListener {
 
-{
+    private lateinit var ideaListAdapter: IdeasListAdapter
 
     private var dialog: ProgressDialog? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(mainTb)
-requestToken()
+        requestToken()
         swipeLayout.setOnRefreshListener { refreshPosts() }
         fab.setOnClickListener { start<NewIdeaActivity>() }
+        recView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            ideaListAdapter = IdeasListAdapter(mutableListOf<Idea>())
+            adapter = ideaListAdapter
+                .apply {
+                    voteBtnClickListener = this@MainActivity
+                    showVotesClickListener = this@MainActivity
+                    loadMoreBtnClickListener = this@MainActivity
+                    authorClickListener = this@MainActivity
+                }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -54,11 +64,15 @@ requestToken()
 
     private fun refreshPosts() {
         lifecycleScope.launch {
-            val newPostsResponse = App.repository.getIdeasRecent()
-            swipeLayout.isRefreshing = false
-            if (newPostsResponse.isSuccessful) {
-                val adap = recView.adapter as IdeasListAdapter
-                adap.loadNewItems((newPostsResponse.body() as MutableList<Idea>?)!!)
+            try {
+                val newPostsResponse = App.repository.getIdeasRecent()
+                swipeLayout.isRefreshing = false
+                if (newPostsResponse.isSuccessful) {
+                    val adap = recView.adapter as IdeasListAdapter
+                    adap.loadNewItems((newPostsResponse.body().orEmpty()))
+                }
+            } catch (e: IOException) {
+                toast(R.string.msg_connection_err)
             }
         }
     }
@@ -66,45 +80,46 @@ requestToken()
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch {
-            dialog = ProgressDialog(this@MainActivity).apply {
-                setMessage(this@MainActivity.getString(R.string.please_wait))
-                setTitle(R.string.loading_posts)
-                setCancelable(false)
-                setProgressBarIndeterminate(true)
-                show()
-            }
-            val response = App.repository.getMe()
-            if (response.isSuccessful) {
-                val user = response.body()!!
-                if(user.onlyReader){
+            try {
+                dialog = ProgressDialog(this@MainActivity).apply {
+                    setMessage(this@MainActivity.getString(R.string.please_wait))
+                    setTitle(R.string.loading_posts)
+                    setCancelable(false)
+                    setProgressBarIndeterminate(true)
+                    show()
+                }
+                val response = App.repository.getMe()
+                if (response.isSuccessful) {
+                    val user = response.body()!!
+                    if (user.onlyReader) {
+                        fab.visibility = View.GONE
+                    }
+
+                }
+
+                val authorId = intent.getLongExtra(INTENT_EXTRA_AUTHOR, 0L)
+                val result: Response<List<Idea>> = if (authorId != 0L) {
                     fab.visibility = View.GONE
+
+                    App.repository.getIdeasByAuthor(authorId = authorId)
+                } else {
+                    App.repository.getIdeasRecent()
                 }
 
-            }
-
-            val authorId = intent.getLongExtra("authorId", 0L)
-            val result: Response<List<Idea>> = if (authorId != 0L) {
-                fab.visibility = View.GONE
-
-                App.repository.getIdeasByAuthor(authorId = authorId)
-            } else {
-                App.repository.getIdeasRecent()
-            }
-
-            dialog?.dismiss()
-            if (result.isSuccessful) {
-                recView.apply {
-                    layoutManager = LinearLayoutManager(this@MainActivity)
-                    adapter = IdeasListAdapter(result.body() as MutableList<Idea>)
-                        .apply {
-                            voteBtnClickListener = this@MainActivity
-                            showVotesClickListener = this@MainActivity
-                            loadMoreBtnClickListener = this@MainActivity
-                            authorClickListener = this@MainActivity
-                        }
+               // dialog?.dismiss()
+                if (result.isSuccessful) {
+                    recView.apply {
+                        layoutManager = LinearLayoutManager(this@MainActivity)
+                        ideaListAdapter.loadNewItems(result.body().orEmpty())
+                    }
+                } else {
+                    toast(R.string.msg_auth_err)
                 }
-            } else {
-                toast(R.string.msg_auth_err)
+            } catch (e: IOException) {
+                toast(R.string.msg_connection_err)
+            }
+            finally {
+                dialog?.dismiss()
             }
         }
     }
@@ -112,20 +127,24 @@ requestToken()
     override fun onLikeBtnClicked(item: Idea, position: Int) {
 
         lifecycleScope.launch {
-            if (!item.likedByMe && !item.dislikedByMe) {
-                item.likeActionPerforming = true
-                with(recView) {
-                    adapter!!.notifyItemChanged(position)
-                    val response = App.repository.likeIdea(item.id)
-                    item.likeActionPerforming = false
-                    if (response.isSuccessful) {
-                        item.updateLikes(response.body()!!)
+            try {
+                if (!item.likedByMe && !item.dislikedByMe) {
+                    item.likeActionPerforming = true
+                    with(recView) {
+                        adapter!!.notifyItemChanged(position, IdeasListAdapter.Payload.LIKE_ACTION)
+                        val response = App.repository.likeIdea(item.id)
+                        item.likeActionPerforming = false
+                        if (response.isSuccessful) {
+                            item.updateLikes(response.body()!!)
+                        }
+                        adapter!!.notifyItemChanged(position, IdeasListAdapter.Payload.LIKE_ACTION)
                     }
-                    adapter!!.notifyItemChanged(position)
-                }
 
-            } else {
-                toast(getString(R.string.msg_already_voted))
+                } else {
+                    toast(getString(R.string.msg_already_voted))
+                }
+            } catch (e: IOException) {
+                toast(R.string.msg_connection_err)
             }
         }
     }
@@ -133,57 +152,67 @@ requestToken()
     override fun onDisLikeBtnClicked(item: Idea, position: Int) {
 
         lifecycleScope.launch {
-            if (!item.likedByMe && !item.dislikedByMe) {
-                item.disLikeActionPerforming = true
-                with(recView) {
-                    adapter!!.notifyItemChanged(position)
-                    val response = App.repository.dislikeIdea(item.id)
-                    item.disLikeActionPerforming = false
-                    if (response.isSuccessful) {
-                        item.updateDisLikes(response.body()!!)
+            try {
+                if (!item.likedByMe && !item.dislikedByMe) {
+                    item.disLikeActionPerforming = true
+                    with(recView) {
+                        adapter!!.notifyItemChanged(
+                            position,
+                            IdeasListAdapter.Payload.DISLIKE_ACTION
+                        )
+                        val response = App.repository.dislikeIdea(item.id)
+                        item.disLikeActionPerforming = false
+                        if (response.isSuccessful) {
+                            item.updateDisLikes(response.body()!!)
+                        }
+                        adapter!!.notifyItemChanged(
+                            position,
+                            IdeasListAdapter.Payload.DISLIKE_ACTION
+                        )
                     }
-                    adapter!!.notifyItemChanged(position)
-
-
+                } else {
+                    toast(getString(R.string.msg_already_voted))
                 }
-            } else {
-                toast(getString(R.string.msg_already_voted))
+            } catch (e: IOException) {
+                toast(R.string.msg_connection_err)
             }
         }
     }
 
     override fun onShowVotesBtnClicked(item: Idea, position: Int) {
-        val int =
-            Intent(this@MainActivity, VotesListActivity::class.java).putExtra("ideaId", item.id)
-        startActivity(int)
+        start<VotesListActivity> {
+            putExtra(INTENT_EXTRA_IDEA, item.id)
+        }
     }
 
     override fun onLoadMoreBtnClickListener(last: Long, size: Int) {
-
         lifecycleScope.launch {
-            val response =
-                App.repository.getPostsBefore(last)
-            progressBar.visibility = View.INVISIBLE
-            loadMoreButton.isEnabled = true
-
-            if (response.isSuccessful) {
-                val newItems = response.body() as MutableList<Idea>
-                print(response.body())
-                with(recView) {
-                    val adap = adapter as IdeasListAdapter
-                    adap.refreshItems(newItems)
-                    adap.notifyItemRangeInserted(size + newItems.size, newItems.size)
+            try {
+                val response =
+                    App.repository.getPostsBefore(last)
+                progressBar.visibility = View.INVISIBLE
+                loadMoreButton.isEnabled = true
+                if (response.isSuccessful) {
+                    val newItems = response.body() as MutableList<Idea>
+                    print(response.body())
+                    with(recView) {
+                        val adap = adapter as IdeasListAdapter
+                        adap.refreshItems(newItems)
+                        adap.notifyItemRangeInserted(size + newItems.size, newItems.size)
+                    }
                 }
-
+            } catch (e: IOException) {
+                toast(R.string.msg_connection_err)
             }
         }
     }
 
     override fun onAuthorClicked(authorId: Long, position: Int) {
-        val intent = Intent(this@MainActivity, MainActivity::class.java)
-        intent.putExtra("authorId", authorId)
-        startActivity(intent)
+        start<MainActivity> {
+            putExtra(INTENT_EXTRA_AUTHOR, authorId)
+        }
     }
+
     private fun requestToken() {
         with(GoogleApiAvailability.getInstance()) {
             val code = isGooglePlayServicesAvailable(this@MainActivity)
@@ -195,12 +224,11 @@ requestToken()
                 getErrorDialog(this@MainActivity, code, 9000).show()
                 return
             }
-
             toast(getString(R.string.msg_no_googleapi))
             return
         }
         FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-        //FirebaseInstallations.getInstance().id.addOnSuccessListener {
+            //FirebaseInstallations.getInstance().id.addOnSuccessListener {
             lifecycleScope.launch {
                 val token = Token(it.token)
                 try {
