@@ -13,8 +13,11 @@ class IdeasListAdapter(val items: MutableList<Idea>) :
     var loadMoreBtnClickListener: OnLoadMoreBtnClickListener? = null
     var authorClickListener: OnAuthorClickListener? = null
 
-    private val ITEM_TYPE_IDEA = 1
-    private val ITEM_TYPE_FOOTER = 2
+    companion object {
+        const val ITEM_TYPE_IDEA = 1
+        const val ITEM_TYPE_FOOTER = 2
+    }
+
 
     class Payload {
         companion object {
@@ -88,7 +91,7 @@ class IdeasListAdapter(val items: MutableList<Idea>) :
         super.onBindViewHolder(holder, position, payloads)
     }
 
-    fun refreshItems(ideas: MutableList<Idea>) {
+    fun refreshItems(ideas: List<Idea>) {
         items.addAll(ideas)
         notifyDataSetChanged()
     }
@@ -105,4 +108,6 @@ class IdeasListAdapter(val items: MutableList<Idea>) :
             is IdeaItemViewHolder -> holder.bind(items[ideaIndex])
         }
     }
+
+
 }

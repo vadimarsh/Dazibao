@@ -47,7 +47,7 @@ class App : Application() {
     private fun logOut() {
         clearUserAuth(this)
         start<StartActivity>{
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
     }
 }

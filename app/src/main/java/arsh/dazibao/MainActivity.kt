@@ -2,9 +2,12 @@ package arsh.dazibao
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +19,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.dialog.*
 import kotlinx.android.synthetic.main.layout_footer.*
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -29,13 +33,14 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
 
     private lateinit var ideaListAdapter: IdeasListAdapter
 
-    private var dialog: ProgressDialog? = null
+    private var progressDialog: ProgressDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(mainTb)
         requestToken()
-        swipeLayout.setOnRefreshListener { refreshPosts() }
+        swipeLayout.setOnRefreshListener { refreshIdeas() }
         fab.setOnClickListener { start<NewIdeaActivity>() }
         recView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -62,18 +67,41 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
         return super.onOptionsItemSelected(item)
     }
 
-    private fun refreshPosts() {
+    private fun createDialog(): AlertDialog.Builder {
+        val dialog = AlertDialog.Builder(this@MainActivity).setView(R.layout.dialog)
+        return dialog
+    }
+
+    private fun refreshIdeas() {
         lifecycleScope.launch {
             try {
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                )
                 val newPostsResponse = App.repository.getIdeasRecent()
-                swipeLayout.isRefreshing = false
+
                 if (newPostsResponse.isSuccessful) {
                     val adap = recView.adapter as IdeasListAdapter
                     adap.loadNewItems((newPostsResponse.body().orEmpty()))
                 }
+                swipeLayout.isRefreshing = false
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             } catch (e: IOException) {
-                toast(R.string.msg_connection_err)
+                swipeLayout.isRefreshing = false
+
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                val dialog = createDialog().show()
+                dialog.retryBtn.setOnClickListener {
+                    swipeLayout.isRefreshing=true
+                    refreshIdeas()
+                    dialog.dismiss()
+                }
+                dialog.cancelBtn.setOnClickListener { dialog.dismiss() }
+                return@launch
+                //toast(R.string.msg_connection_err)
             }
+
         }
     }
 
@@ -81,7 +109,7 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
         super.onStart()
         lifecycleScope.launch {
             try {
-                dialog = ProgressDialog(this@MainActivity).apply {
+                progressDialog = ProgressDialog(this@MainActivity).apply {
                     setMessage(this@MainActivity.getString(R.string.please_wait))
                     setTitle(R.string.loading_posts)
                     setCancelable(false)
@@ -106,7 +134,6 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
                     App.repository.getIdeasRecent()
                 }
 
-               // dialog?.dismiss()
                 if (result.isSuccessful) {
                     recView.apply {
                         layoutManager = LinearLayoutManager(this@MainActivity)
@@ -115,11 +142,21 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
                 } else {
                     toast(R.string.msg_auth_err)
                 }
+                progressDialog?.dismiss()
             } catch (e: IOException) {
-                toast(R.string.msg_connection_err)
-            }
-            finally {
-                dialog?.dismiss()
+
+                progressDialog?.dismiss()
+
+                val dialog = createDialog().show()
+                dialog.retryBtn.setOnClickListener {
+                    swipeLayout.isRefreshing=true
+                    refreshIdeas()
+                    dialog.dismiss()
+                }
+                dialog.cancelBtn.setOnClickListener { dialog.dismiss() }
+                return@launch
+
+                //toast(R.string.msg_connection_err)
             }
         }
     }
@@ -174,7 +211,8 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
                     toast(getString(R.string.msg_already_voted))
                 }
             } catch (e: IOException) {
-                toast(R.string.msg_connection_err)
+                //createDialog()
+                //toast(R.string.msg_connection_err)
             }
         }
     }
@@ -190,19 +228,22 @@ class MainActivity : AppCompatActivity(), OnVoteBtnClickListener,
             try {
                 val response =
                     App.repository.getPostsBefore(last)
-                progressBar.visibility = View.INVISIBLE
-                loadMoreButton.isEnabled = true
+
                 if (response.isSuccessful) {
-                    val newItems = response.body() as MutableList<Idea>
-                    print(response.body())
-                    with(recView) {
-                        val adap = adapter as IdeasListAdapter
-                        adap.refreshItems(newItems)
-                        adap.notifyItemRangeInserted(size + newItems.size, newItems.size)
-                    }
+                    val newItems = response.body().orEmpty()
+                    ideaListAdapter.refreshItems(newItems)
+                    ideaListAdapter.notifyItemRangeInserted(size + newItems.size, newItems.size)
                 }
+
             } catch (e: IOException) {
-                toast(R.string.msg_connection_err)
+                //toast(R.string.msg_connection_err)
+                val dialog = createDialog().show()
+                dialog.retryBtn.setOnClickListener {
+                    onLoadMoreBtnClickListener(last,size)
+                    dialog.dismiss()
+                }
+                dialog.cancelBtn.setOnClickListener { dialog.dismiss() }
+                return@launch
             }
         }
     }

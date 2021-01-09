@@ -35,4 +35,6 @@
     <string name="msg_err_content_att">Заполните текст идеи и прикрепите изображение</string>
     <string name="txt_sw_add_photo_gal">Добавить фото из галерии</string>
     <string name="msg_err_login_alrdy_exist">Пользователь с таким логином уже есть</string>
+    <string name="txt_but_retry">Попробовать еще раз</string>
+    <string name="txt_but_cancel">Отмена</string>
 </resources>

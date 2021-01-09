@@ -2,6 +2,7 @@ package arsh.dazibao
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,11 +21,20 @@ import java.io.IOException
 class VotesListActivity : AppCompatActivity(), IdeasListAdapter.OnAuthorClickListener {
     private val ideaId: Long by lazy { intent.getLongExtra(INTENT_EXTRA_IDEA, 0L) }
     private var dialog: ProgressDialog? = null
+    private lateinit var votesListAdapter: VotesListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_votes_list)
         setSupportActionBar(mainTb)
+        recViewVotes.apply {
+            layoutManager = LinearLayoutManager(this@VotesListActivity)
+            votesListAdapter = VotesListAdapter(mutableListOf<Vote>())
+            adapter = votesListAdapter
+                .apply {
+                    authorClickListener = this@VotesListActivity
+                }
+        }
     }
 
     override fun onAuthorClicked(authorId: Long, position: Int) {
@@ -47,22 +57,25 @@ class VotesListActivity : AppCompatActivity(), IdeasListAdapter.OnAuthorClickLis
                 }
                 val result: Response<List<Vote>> = App.repository.getVotes(ideaId)
 
-               // dialog?.dismiss()
+                // dialog?.dismiss()
                 if (result.isSuccessful) {
-                    recViewVotes.apply {
-                        layoutManager = LinearLayoutManager(this@VotesListActivity)
-                        adapter = VotesListAdapter(result.body() as MutableList<Vote>)
-                            .apply {
-                                authorClickListener = this@VotesListActivity
-                            }
+                    if(result.body().orEmpty().isNotEmpty()) {
+                        recViewVotes.apply {
+                            layoutManager = LinearLayoutManager(this@VotesListActivity)
+                            adapter = VotesListAdapter(result.body().orEmpty())
+                                .apply {
+                                    authorClickListener = this@VotesListActivity
+                                }
+                        }
+                    }else{
+                        novotesTv.visibility= View.VISIBLE
                     }
                 } else {
                     toast(R.string.msg_auth_err)
                 }
             } catch (e: IOException) {
                 toast(R.string.msg_connection_err)
-            }
-            finally {
+            } finally {
                 dialog?.dismiss()
             }
         }

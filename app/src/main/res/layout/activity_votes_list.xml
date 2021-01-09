@@ -22,6 +22,20 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/novotesTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Пока еще никто не оценил эту идею"
+            android:textSize="36sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/recViewVotes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainTb" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recViewVotes"
 
@@ -32,7 +46,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mainTb"
-            tools:itemCount="8" />
+            tools:itemCount="8" >
+
+        </androidx.recyclerview.widget.RecyclerView>
 
 
 

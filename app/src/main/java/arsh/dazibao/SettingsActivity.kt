@@ -8,11 +8,13 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_settings.*
+import kotlinx.android.synthetic.main.dialog.*
 import kotlinx.coroutines.launch
 import splitties.toast.toast
 import java.io.IOException
@@ -23,7 +25,7 @@ class SettingsActivity : AppCompatActivity() {
         const val GALLERY_REQUEST = 2
     }
 
-    private var dialog: ProgressDialog? = null
+    private var progressDialog: ProgressDialog? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -32,6 +34,10 @@ class SettingsActivity : AppCompatActivity() {
         attachPhotoIv.setOnClickListener {
             dispatchTakePictureIntent()
         }
+        changesConfirmBut.setOnClickListener {
+            confirmChanges()
+        }
+        loadMyInfo()
     }
 
     private fun setUserAuth(token: String) =
@@ -39,69 +45,87 @@ class SettingsActivity : AppCompatActivity() {
             putString(AUTHENTICATED_SHARED_KEY, token)
         }
 
-    override fun onStart() {
-        super.onStart()
-        lifecycleScope.launch {
-            val dialog = ProgressDialog(this@SettingsActivity).apply {
-                setMessage(this@SettingsActivity.getString(R.string.please_wait))
-                setTitle(R.string.loading_posts)
-                setCancelable(false)
-                setProgressBarIndeterminate(true)
-                show()
-            }
-            val response = App.repository.getMe()
-            try {
 
-                if (response.isSuccessful) {
-                    val user = response.body()!!
-                    authorNameTv.text = user.username
-                    if(user.onlyReader){
-                        rankTv.text = "Только просмотр и голосование"
-                    }else{
-                        rankTv.text = "Полноправный автор"}
-                    if (user.avatar != null) {
-                        loadImage(avatarIv, user.avatar.url)
-                    }
-                } else {
-                    toast(R.string.msg_err)
-                }
-            } catch (e: IOException) {
-                toast(R.string.msg_connection_err)
-            } finally {
-                dialog.dismiss()
-            }
+private fun loadMyInfo(){
+    lifecycleScope.launch {
+        progressDialog = ProgressDialog(this@SettingsActivity).apply {
+            setMessage(this@SettingsActivity.getString(R.string.please_wait))
+            setTitle(R.string.loading_posts)
+            setCancelable(false)
+            setProgressBarIndeterminate(true)
+            show()
         }
 
-        changesConfirmBut.setOnClickListener {
-            val oldPassword = et_old_pswd.text.toString()
-            val newPassword = et_pswd.text.toString()
-            val confirmPassword = et_new_Pswd.text.toString()
-            if (oldPassword.isEmpty() || newPassword.isEmpty()) {
-                toast(R.string.msg_paswd_invalid_err)
-            } else if (newPassword != confirmPassword) {
-                toast(R.string.msg_difpsw_err)
+        try {
+            val response = App.repository.getMe()
+            progressDialog!!.dismiss()
+            if (response.isSuccessful) {
+                val user = response.body()!!
+                authorNameTv.text = user.username
+                if (user.onlyReader) {
+                    rankTv.text = "Только просмотр и голосование"
+                } else {
+                    rankTv.text = "Полноправный автор"
+                }
+                if (user.avatar != null) {
+                    loadImage(avatarIv, user.avatar.url)
+                }
             } else {
-                lifecycleScope.launch {
-                    dialog = ProgressDialog(this@SettingsActivity).apply {
-                        setMessage(this@SettingsActivity.getString(R.string.please_wait))
-                        setTitle(R.string.loading_posts)
-                        setCancelable(false)
-                        setProgressBarIndeterminate(true)
-                        show()
+                toast(R.string.msg_err)
+            }
+        } catch (e: IOException) {
+            progressDialog!!.dismiss()
+
+
+            val dialog = createDialog().show()
+            dialog.retryBtn.setOnClickListener {
+                dialog.dismiss()
+                loadMyInfo()
+            }
+            dialog.cancelBtn.setOnClickListener { dialog.dismiss() }
+            return@launch
+        //toast(R.string.msg_connection_err)
+        }
+    }
+
+}
+    private fun confirmChanges() {
+        val oldPassword = et_old_pswd.text.toString()
+        val newPassword = et_pswd.text.toString()
+        val confirmPassword = et_new_Pswd.text.toString()
+        if (oldPassword.isEmpty() || newPassword.isEmpty()) {
+            toast(R.string.msg_paswd_invalid_err)
+        } else if (newPassword != confirmPassword) {
+            toast(R.string.msg_difpsw_err)
+        } else {
+            lifecycleScope.launch {
+                progressDialog = ProgressDialog(this@SettingsActivity).apply {
+                    setMessage(this@SettingsActivity.getString(R.string.please_wait))
+                    setTitle(R.string.loading_posts)
+                    setCancelable(false)
+                    setProgressBarIndeterminate(true)
+                    show()
+                }
+                try {
+                    val response = App.repository.changePswd(oldPassword, newPassword)
+                    progressDialog?.dismiss()
+                    if (response.isSuccessful) {
+                        setUserAuth(response.body()!!.token)
+                        toast("Пароль изменен успешно")
+                    } else {
+                        toast(R.string.msg_err)
                     }
-                    try {
-                        val response = App.repository.changePswd(oldPassword, newPassword)
-                        if (response.isSuccessful) {
-                            setUserAuth(response.body()!!.token)
-                            toast("Пароль изменен успешно")
-                        } else {
-                            toast(R.string.msg_err)
-                        }
-                    } catch (e: Exception) {
-                        toast(R.string.msg_connection_err)
-                    } finally {
-                        dialog?.dismiss()
+                } catch (e: Exception) {
+                    progressDialog!!.dismiss()
+                    val dialog = createDialog().show()
+                    dialog.retryBtn.setOnClickListener {
+
+                        dialog.dismiss()
+                        confirmChanges()
                     }
+                    dialog.cancelBtn.setOnClickListener { dialog.dismiss() }
+                    return@launch
+                    //toast(R.string.msg_connection_err)
                 }
             }
         }
@@ -145,7 +169,7 @@ class SettingsActivity : AppCompatActivity() {
         imageBitmap?.let {
             lifecycleScope.launch {
                 try {
-                    dialog = ProgressDialog(this@SettingsActivity).apply {
+                    progressDialog = ProgressDialog(this@SettingsActivity).apply {
                         setMessage(this@SettingsActivity.getString(R.string.please_wait))
                         setTitle(R.string.loading_posts)
                         setCancelable(false)
@@ -153,6 +177,7 @@ class SettingsActivity : AppCompatActivity() {
                         show()
                     }
                     val imageUploadResult = App.repository.upload(it)
+                    progressDialog!!.dismiss()
 
                     if (imageUploadResult.isSuccessful) {
                         toast("Изображение успешно загружено")
@@ -165,14 +190,24 @@ class SettingsActivity : AppCompatActivity() {
                     } else {
                         toast(R.string.msg_err)
                     }
+
                 } catch (e: IOException) {
-                    toast(R.string.msg_connection_err)
-                } finally {
-                    dialog?.dismiss()
+                    progressDialog!!.dismiss()
+                    val dialog = createDialog().show()
+                    dialog.retryBtn.setOnClickListener {
+                        dialog.dismiss()
+                        loadImageToServer(imageBitmap)
+                    }
+                    dialog.cancelBtn.setOnClickListener { dialog.dismiss() }
+                    return@launch
                 }
             }
         }
     }
 
+    private fun createDialog(): AlertDialog.Builder {
+        val dialog = AlertDialog.Builder(this@SettingsActivity).setView(R.layout.dialog)
+        return dialog
+    }
 
 }

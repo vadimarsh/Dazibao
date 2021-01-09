@@ -7,7 +7,7 @@ import arsh.dazibao.R
 import arsh.dazibao.model.Idea
 import arsh.dazibao.model.Vote
 
-class VotesListAdapter(val votes:MutableList<Vote>):
+class VotesListAdapter(val votes:List<Vote>):
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var authorClickListener: IdeasListAdapter.OnAuthorClickListener?=null
 
